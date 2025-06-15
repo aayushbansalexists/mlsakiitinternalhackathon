@@ -2,89 +2,48 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Camera, ChefHat, Sparkles, Clock, Users, Zap } from 'lucide-react';
+import {
+  processImageAndGetRecipes, Recipe
+} from '../utils/api';
 
 const BiteAdvisor = () => {
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [detectedIngredients, setDetectedIngredients] = useState([]);
-  const [recipes, setRecipes] = useState([]);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [mascotMessage, setMascotMessage] = useState("Hey there! I'm your cooking buddy. Upload a photo of your ingredients!");
-  const fileInputRef = useRef(null);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [detectedIngredients, setDetectedIngredients] = useState<string[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [mascotMessage, setMascotMessage] = useState<string>("Hey there! I'm your cooking buddy. Upload a photo of your ingredients!");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Mock ingredient detection (replace with actual API)
-  const mockDetectIngredients = (imageFile) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockIngredients = ['tomato', 'onion', 'garlic', 'egg', 'cheese'];
-        const randomIngredients = mockIngredients
-          .sort(() => 0.5 - Math.random())
-          .slice(0, Math.floor(Math.random() * 4) + 2);
-        resolve(randomIngredients);
-      }, 2000);
-    });
-  };
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  // Mock recipe fetching (replace with Spoonacular API)
-  const mockFetchRecipes = (ingredients) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockRecipes = [
-          {
-            id: 1,
-            title: "Classic Tomato Omelette",
-            readyInMinutes: 15,
-            servings: 2,
-            image: "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=300&h=200&fit=crop",
-            matchedIngredients: ingredients.length,
-            nutrition: { calories: 320, protein: 18, carbs: 8, fat: 24 }
-          },
-          {
-            id: 2,
-            title: "Cheesy Scrambled Eggs",
-            readyInMinutes: 10,
-            servings: 1,
-            image: "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=300&h=200&fit=crop",
-            matchedIngredients: ingredients.length - 1,
-            nutrition: { calories: 280, protein: 16, carbs: 4, fat: 22 }
-          },
-          {
-            id: 3,
-            title: "Mediterranean Veggie Bowl",
-            readyInMinutes: 25,
-            servings: 2,
-            image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&h=200&fit=crop",
-            matchedIngredients: ingredients.length - 2,
-            nutrition: { calories: 240, protein: 12, carbs: 18, fat: 14 }
-          }
-        ];
-        resolve(mockRecipes);
-      }, 1500);
-    });
-  };
+    setLoading(true);
+    setError('');
+    setMascotMessage("Analyzing your ingredients... 🧐");
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setLoading(true);
-      setMascotMessage("Analyzing your ingredients... 🧐");
+    const imageUrl = URL.createObjectURL(file);
+    setUploadedImage(imageUrl);
 
-      const imageUrl = URL.createObjectURL(file);
-      setUploadedImage(imageUrl);
+    try {
+      // Use the real API functions
+      const result = await processImageAndGetRecipes(file);
 
-      try {
-        const ingredients = await mockDetectIngredients(file);
-        setDetectedIngredients(ingredients);
-        setMascotMessage(`Found ${ingredients.length} ingredients! Let me find some recipes...`);
+      setDetectedIngredients(result.ingredients);
+      setMascotMessage(`Found ${result.ingredients.length} ingredients! Let me find some recipes...`);
 
-        const recipeResults = await mockFetchRecipes(ingredients);
-        setRecipes(recipeResults);
-        setMascotMessage("Perfect! I found some delicious recipes for you! 🍳");
-      } catch (error) {
-        setMascotMessage("Oops! Something went wrong. Try again?");
-      } finally {
-        setLoading(false);
-      }
+      setRecipes(result.recipes);
+      setMascotMessage("Perfect! I found some delicious recipes for you! 🍳");
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Try again?';
+      setError(errorMessage);
+      setMascotMessage("Oops! Something went wrong. Try again?");
+      console.error('Error processing image:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,6 +114,16 @@ const BiteAdvisor = () => {
           </div>
         </div>
 
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-2xl mb-8">
+            <div className="flex items-center">
+              <span className="font-semibold">Error: </span>
+              <span className="ml-2">{error}</span>
+            </div>
+          </div>
+        )}
+
         {/* Upload Section */}
         <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20">
           <div className="text-center">
@@ -185,8 +154,9 @@ const BiteAdvisor = () => {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+                  disabled={loading}
                 >
-                  Upload New Image
+                  {loading ? 'Processing...' : 'Upload New Image'}
                 </button>
               </div>
             )}
@@ -199,6 +169,9 @@ const BiteAdvisor = () => {
             <div className="text-center">
               <div className="animate-spin w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full mx-auto mb-4"></div>
               <p className="text-gray-600">AI is working its magic...</p>
+              <p className="text-sm text-gray-500 mt-2">
+                {detectedIngredients.length === 0 ? 'Detecting ingredients...' : 'Finding recipes...'}
+              </p>
             </div>
           </div>
         )}
@@ -248,12 +221,19 @@ const BiteAdvisor = () => {
                         <span>{recipe.servings} servings</span>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-orange-600">
-                        {recipe.matchedIngredients} ingredients matched
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-green-600">
+                        ✅ {recipe.matchedIngredients} matched
                       </span>
+                      {recipe.missedIngredients > 0 && (
+                        <span className="text-sm font-semibold text-orange-600">
+                          ➕ {recipe.missedIngredients} missing
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-right">
                       <span className="text-sm font-bold text-gray-800">
-                        {recipe.nutrition.calories} cal
+                        🔥 {Math.round(recipe.nutrition.calories)} cal
                       </span>
                     </div>
                   </div>
@@ -284,6 +264,15 @@ const BiteAdvisor = () => {
                   className="w-full h-64 object-cover rounded-2xl mb-6"
                 />
 
+                {/* Recipe Summary */}
+                {selectedRecipe.summary && (
+                  <div className="mb-6">
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      {selectedRecipe.summary.substring(0, 200)}...
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-6 mb-6">
                   <div className="bg-orange-50 rounded-2xl p-4">
                     <h4 className="font-semibold text-gray-800 mb-2">Cooking Info</h4>
@@ -296,6 +285,16 @@ const BiteAdvisor = () => {
                         <span>Servings:</span>
                         <span className="font-semibold">{selectedRecipe.servings}</span>
                       </div>
+                      <div className="flex justify-between">
+                        <span>Matched:</span>
+                        <span className="font-semibold text-green-600">{selectedRecipe.matchedIngredients}</span>
+                      </div>
+                      {selectedRecipe.missedIngredients > 0 && (
+                        <div className="flex justify-between">
+                          <span>Missing:</span>
+                          <span className="font-semibold text-orange-600">{selectedRecipe.missedIngredients}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -304,30 +303,42 @@ const BiteAdvisor = () => {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Calories:</span>
-                        <span className="font-semibold">{selectedRecipe.nutrition.calories}</span>
+                        <span className="font-semibold">{Math.round(selectedRecipe.nutrition.calories)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Protein:</span>
-                        <span className="font-semibold">{selectedRecipe.nutrition.protein}g</span>
+                        <span className="font-semibold">{Math.round(selectedRecipe.nutrition.protein)}g</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Carbs:</span>
-                        <span className="font-semibold">{selectedRecipe.nutrition.carbs}g</span>
+                        <span className="font-semibold">{Math.round(selectedRecipe.nutrition.carbs)}g</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Fat:</span>
-                        <span className="font-semibold">{selectedRecipe.nutrition.fat}g</span>
+                        <span className="font-semibold">{Math.round(selectedRecipe.nutrition.fat)}g</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setSelectedRecipe(null)}
-                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-colors"
-                >
-                  Start Cooking!
-                </button>
+                <div className="space-y-3">
+                  {selectedRecipe.sourceUrl && (
+                    <a
+                      href={selectedRecipe.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold transition-colors text-center block"
+                    >
+                      View Full Recipe
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setSelectedRecipe(null)}
+                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-colors"
+                  >
+                    Close Recipe
+                  </button>
+                </div>
               </div>
             </div>
           </div>
