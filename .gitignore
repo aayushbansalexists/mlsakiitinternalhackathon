@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python (FastAPI backend folder, if co-located)
+__pycache__/
+*.py[cod]
+*.sqlite3
+venv/
+env/
+*.egg-info/
+*.log
+
+# Blender / Mascot assets
+*.blend1
+*.blend2
+*.gltf
+*.glb
