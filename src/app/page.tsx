@@ -6,6 +6,7 @@ import {
   processImageAndGetRecipes, Recipe
 } from '../utils/api';
 import 'animate.css';
+import EnhancedMascotSection from '@/components/EnhancedMascotSection'
 
 const BiteAdvisor = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -47,35 +48,6 @@ const BiteAdvisor = () => {
       setLoading(false);
     }
   };
-
-  const MascotAvatar = () => {
-    const [isBlinking, setIsBlinking] = useState(false);
-
-    useEffect(() => {
-      const blinkInterval = setInterval(() => {
-        setIsBlinking(true);
-        setTimeout(() => setIsBlinking(false), 150);
-      }, 3000);
-
-      return () => clearInterval(blinkInterval);
-    }, []);
-
-    return (
-      <div className="relative w-24 h-24 mx-auto mb-4">
-        <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-lg">
-          <ChefHat className="w-12 h-12 text-white" />
-        </div>
-        <div className="absolute top-2 left-6 w-3 h-3 bg-white rounded-full flex items-center justify-center">
-          <div className={`w-2 h-2 bg-black rounded-full transition-transform duration-150 ${isBlinking ? 'scale-y-0' : 'scale-y-100'}`} />
-        </div>
-        <div className="absolute top-2 right-6 w-3 h-3 bg-white rounded-full flex items-center justify-center">
-          <div className={`w-2 h-2 bg-black rounded-full transition-transform duration-150 ${isBlinking ? 'scale-y-0' : 'scale-y-100'}`} />
-        </div>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-6 h-3 bg-white rounded-full" />
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
       {/* Header */}
@@ -106,14 +78,7 @@ const BiteAdvisor = () => {
         </div>
 
         {/* Mascot Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20 animate__animated animate__bounceIn">
-          <MascotAvatar />
-          <div className="text-center">
-            <div className="bg-white rounded-2xl p-4 shadow-md inline-block max-w-md">
-              <p className="text-gray-700 font-medium">{mascotMessage}</p>
-            </div>
-          </div>
-        </div>
+        <EnhancedMascotSection mascotMessage={mascotMessage} />
 
         {/* Error Display */}
         {error && (
@@ -186,7 +151,7 @@ const BiteAdvisor = () => {
                 <span
                   key={index}
                   className="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md animate__animated animate__bounceIn"
-                  style={{animationDelay: `${index * 0.1}s`}}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {ingredient}
                 </span>
@@ -204,7 +169,7 @@ const BiteAdvisor = () => {
                 <div
                   key={recipe.id}
                   className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer animate__animated animate__zoomIn hover:animate__pulse"
-                  style={{animationDelay: `${index * 0.2}s`}}
+                  style={{ animationDelay: `${index * 0.2}s` }}
                   onClick={() => setSelectedRecipe(recipe)}
                 >
                   <img
