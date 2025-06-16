@@ -7,6 +7,7 @@ import {
 } from '../utils/api';
 import 'animate.css';
 import EnhancedMascotSection from '@/components/EnhancedMascotSection'
+import GeminiChatbot from '@/components/GeminiChatBot';
 
 const BiteAdvisor = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -210,6 +211,7 @@ const BiteAdvisor = () => {
             </div>
           </div>
         )}
+        <GeminiChatbot />
 
         {/* Recipe Detail Modal */}
         {selectedRecipe && (
