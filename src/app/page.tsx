@@ -5,6 +5,7 @@ import { Upload, Camera, ChefHat, Sparkles, Clock, Users, Zap } from 'lucide-rea
 import {
   processImageAndGetRecipes, Recipe
 } from '../utils/api';
+import 'animate.css';
 
 const BiteAdvisor = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -95,7 +96,7 @@ const BiteAdvisor = () => {
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Hero Section */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 animate__animated animate__fadeIn">
           <h2 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-orange-600 via-red-500 to-pink-500 bg-clip-text text-transparent">
             Cook Smart with AI
           </h2>
@@ -105,7 +106,7 @@ const BiteAdvisor = () => {
         </div>
 
         {/* Mascot Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20">
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20 animate__animated animate__bounceIn">
           <MascotAvatar />
           <div className="text-center">
             <div className="bg-white rounded-2xl p-4 shadow-md inline-block max-w-md">
@@ -116,7 +117,7 @@ const BiteAdvisor = () => {
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-2xl mb-8">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-2xl mb-8 animate__animated animate__shakeX">
             <div className="flex items-center">
               <span className="font-semibold">Error: </span>
               <span className="ml-2">{error}</span>
@@ -125,7 +126,7 @@ const BiteAdvisor = () => {
         )}
 
         {/* Upload Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20">
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20 animate__animated animate__fadeInUp animate__delay-1s">
           <div className="text-center">
             <input
               type="file"
@@ -138,7 +139,7 @@ const BiteAdvisor = () => {
             {!uploadedImage ? (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-orange-300 rounded-2xl p-12 hover:border-orange-400 transition-colors cursor-pointer bg-gradient-to-br from-orange-50 to-red-50"
+                className="border-2 border-dashed border-orange-300 rounded-2xl p-12 hover:border-orange-400 transition-colors cursor-pointer bg-gradient-to-br from-orange-50 to-red-50 hover:animate__animated hover:animate__pulse"
               >
                 <Camera className="w-16 h-16 text-orange-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">Upload Your Ingredients</h3>
@@ -165,7 +166,7 @@ const BiteAdvisor = () => {
 
         {/* Loading */}
         {loading && (
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20">
+          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20 animate__animated animate__fadeIn">
             <div className="text-center">
               <div className="animate-spin w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full mx-auto mb-4"></div>
               <p className="text-gray-600">AI is working its magic...</p>
@@ -178,13 +179,14 @@ const BiteAdvisor = () => {
 
         {/* Detected Ingredients */}
         {detectedIngredients.length > 0 && !loading && (
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20">
+          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 mb-8 shadow-xl border border-white/20 animate__animated animate__slideInUp">
             <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">Detected Ingredients</h3>
             <div className="flex flex-wrap justify-center gap-3">
               {detectedIngredients.map((ingredient, index) => (
                 <span
                   key={index}
-                  className="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md"
+                  className="bg-gradient-to-r from-orange-400 to-red-400 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md animate__animated animate__bounceIn"
+                  style={{animationDelay: `${index * 0.1}s`}}
                 >
                   {ingredient}
                 </span>
@@ -195,13 +197,14 @@ const BiteAdvisor = () => {
 
         {/* Recipe Results */}
         {recipes.length > 0 && (
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 animate__animated animate__fadeInUp">
             <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">Recommended Recipes</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recipes.map((recipe) => (
+              {recipes.map((recipe, index) => (
                 <div
                   key={recipe.id}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer animate__animated animate__zoomIn hover:animate__pulse"
+                  style={{animationDelay: `${index * 0.2}s`}}
                   onClick={() => setSelectedRecipe(recipe)}
                 >
                   <img
@@ -245,8 +248,8 @@ const BiteAdvisor = () => {
 
         {/* Recipe Detail Modal */}
         {selectedRecipe && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate__animated animate__fadeIn">
+            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate__animated animate__zoomIn">
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">
                   <h3 className="text-2xl font-bold text-gray-800">{selectedRecipe.title}</h3>
