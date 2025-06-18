@@ -1,5 +1,10 @@
-# 🍳 BiteAdvisor
-## AI-Powered Smart Cooking Assistant
+<p align="center">
+  <a href="" rel="noopener">
+ <img width=150px height=150px src="public/mascot/broccoli-mascot-0.png" alt="biteadvisor"></a>
+</p>
+
+<h1 align="center">🍳 BiteAdvisor</h1>
+<h3 align="center">AI-Powered Smart Cooking Assistant</h3>
 
 <div align="center">
   <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js">
